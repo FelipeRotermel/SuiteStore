@@ -46,22 +46,20 @@
     <script>
 
         function RenderCategories(){
-            let category = JSON.parse(localStorage.getItem('categories'));
-            console.log(category)
+            let categories = JSON.parse(localStorage.getItem('categories'));
             let select = document.querySelector('.ProductSelectInput');
-            let option = document.createElement('option')
-            option.innerHTML = `
-                ${category}
-            `;
-            select.append(option);
+            
+            categories.forEach(category => {
+                let option = document.createElement('option');
+                option.innerHTML = category.name;
+                select.append(option);
+            });
         }
 
         function GetCategories(){
             let categories = JSON.parse(localStorage.getItem('categories'));
             if(categories){
-                categories.forEach(category => {
-                    RenderCategories(category);
-                });
+                RenderCategories(categories);
             }
         }
 
@@ -97,7 +95,7 @@
                 <td>${product.name}</td>
                 <td>${product.amount}</td>
                 <td>${product.price}</td>
-                <td>${product.category}</td>
+                <td>${category.innerHTML}</td>
                 <td><button class="ProductsDeleteButton" onclick="DeleteProduct()">Delete</button></td>
             `;
             table.append(row);
