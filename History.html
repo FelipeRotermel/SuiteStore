@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Style.css">
+    <title>History</title>
+</head>
+<body>
+
+    <nav class="NavBar">
+        <a class="Logo" href="index.html">Suite Store</a>
+        <ul class="NavBarLinks">
+            <li class="NavBarLink"><a href="Products.html">Products</a></li>
+            <li class="NavBarLink"><a href="Categories.html">Categories</a></li>
+            <li class="NavBarLink"><a href="History.html">History</a></li>
+        </ul>
+    </nav>
+    <div class="HistoryContainer">
+        <table class="HistoryTable">
+            <thead class="HistoryTableItems">
+                <th>Code</th>
+                <th>Tax</th>
+                <th>Total</th>
+            </thead>
+            <tbody>
+                <tr class="HistoryTableItems">
+                    <td>001</td>
+                    <td class="tax">2.00</td>
+                    <td>20.00</td>
+                    <td><button onclick="ViewProduct()" value="0">View</button></td>
+                </tr>
+                <tr class="HistoryTableItems">
+                    <td>002</td>
+                    <td class="tax">0.50</td>
+                    <td>10.00</td>
+                    <td><button onclick="ViewProduct()" value="1">View</button></td>
+                </tr>
+            </tbody>
+        </table>
+        <br>
+        <div id="detail">
+            <p></p>
+        </div>
+    </div>
+
+    <script>
+
+        function ViewProduct() {
+
+            var id = event.target.value;
+            console.log(id)
+
+            var tax = document.getElementsByClassName("tax")[id].innerHTML;
+            console.log(tax)
+
+            if(tax == 2) {
+                document.getElementById("detail").innerHTML = "Rice - 2 - 20";
+            } else if(tax == 0.5) {
+                document.getElementById("detail").innerHTML = "Potato - 10 - 10";
+            }
+        }
+        
+    </script>
+    
+</body>
+</html>

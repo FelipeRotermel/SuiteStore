@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Style.css">
+    <title>Products</title>
+</head>
+<body>
+    
+    <nav class="NavBar">
+        <a class="Logo" href="index.html">Suite Store</a>
+        <ul class="NavBarLinks">
+            <li class="NavBarLink"><a href="Products.html">Products</a></li>
+            <li class="NavBarLink"><a href="Categories.html">Categories</a></li>
+            <li class="NavBarLink"><a href="History.html">History</a></li>
+        </ul>
+    </nav>
+    <div class="Container">
+        <div class="Column">
+            <input class="ProductNameInput" type="text" id="name" placeholder="Product Name">
+            <br>
+            <input class="ProductAmountInput" type="number" id="amount" placeholder="Amount">
+            <input type="number" id="price" placeholder="Price">
+            <select class="ProductSelectInput" id="category">
+            </select>
+            <br>
+            <button class="ProductsButton" onclick="SaveProduct()">Add Product</button>
+        </div>
+        <div class="Column Line">
+            <table class="ProductsTable">
+                <thead class="ProductsTableItems">
+                    <th class="Others">Code</th>
+                    <th class="Product">Product</th>
+                    <th class="Others">Amount</th>
+                    <th class="Others">Unit Price</th>
+                    <th class="Others">Category</th>
+                    <th class="Others">Action</th>
+                </thead>
+                <tbody class="ProductsTableCategoryItems">
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+
+        function RenderCategories(){
+            let category = JSON.parse(localStorage.getItem('categories'));
+            console.log(category)
+            let select = document.querySelector('.ProductSelectInput');
+            let option = document.createElement('option')
+            option.innerHTML = `
+                ${category}
+            `;
+            select.append(option);
+        }
+
+        function GetCategories(){
+            let categories = JSON.parse(localStorage.getItem('categories'));
+            if(categories){
+                categories.forEach(category => {
+                    RenderCategories(category);
+                });
+            }
+        }
+
+        GetCategories();
+
+        function SaveProduct() {
+            let products = JSON.parse(localStorage.getItem('products')) || [];
+            let name = document.getElementById("name").value;
+            let amount = document.getElementById("amount").value;
+            let price = document.getElementById("price").value;
+            let category = document.getElementById("category")
+            let id = 0;
+            
+            for (let i = 0; i < products.length; i++) {
+                if (products[i].id >= id) {
+                    console.log(products[i].id)
+                    id = products[i].id + 1;
+                }
+            }
+            
+            let product = { id, name, amount, price, category };
+            products.push(product);
+            localStorage.setItem('products', JSON.stringify(products));
+            
+            RenderProduct(product);
+        }
+
+        function RenderProduct(product){
+            let table = document.querySelector('.ProductsTableCategoryItems');
+            let row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${product.id}</td>
+                <td>${product.name}</td>
+                <td>${product.amount}</td>
+                <td>${product.price}</td>
+                <td>${product.category}</td>
+                <td><button class="ProductsDeleteButton" onclick="DeleteProduct()">Delete</button></td>
+            `;
+            table.append(row);
+        }
+
+        function GetProducts(){
+            let products = JSON.parse(localStorage.getItem('products'));
+            if(products){
+                products.forEach(product => {
+                    RenderProduct(product);
+                });
+            }
+        }
+
+        GetProducts();
+
+        function DeleteProduct() {
+            let row = this.event.target.parentElement.parentElement;
+            let id = row.children[0].innerText;
+            let name = row.children[1].innerText;
+            let products = JSON.parse(localStorage.getItem('products'));
+            let newProducts = products.filter(product => product.id !== id && product.name !== name);
+            localStorage.setItem('products', JSON.stringify(newProducts));
+            row.remove();
+        }
+
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="Style.css">
+    <title>PDV</title>
+</head>
+<body>
+
+    <nav class="NavBar">
+        <a class="Logo" href="index.html">Suite Store</a>
+        <ul class="NavBarLinks">
+            <li class="NavBarLink"><a href="Products.html">Products</a></li>
+            <li class="NavBarLink"><a href="Categories.html">Categories</a></li>
+            <li class="NavBarLink"><a href="History.html">History</a></li>
+        </ul>
+    </nav>
+    <div class="Container">
+        <div class="Column">
+            <select class="ProductInput" name="Product" id="">
+                <option value="" selected disabled>Product</option>
+                <option value="">Beans</option>
+                <option value="">Rice</option>
+            </select>
+            <input class="AmountInput"type="number" placeholder="Amount">
+            <br><br>
+            <input class="TaxInput" type="number" placeholder="Tax">
+            <input class="PriceInput" type="number" placeholder="Price">
+            <br>
+            <button class="ProductsButton">Add Product</button>
+        </div>
+        <div class="Column Line">
+            <table class="ProductsTable">
+                <thead class="ProductsTableItems">
+                    <th class="Product">Product</th>
+                    <th class="Others">Price</th>
+                    <th class="Others">Amount</th>
+                    <th class="Others">Total</th>
+                </thead>
+                <tbody>
+                    <tr class="ProductsTableItems">
+                        <td>Rice</td>
+                        <td>R$ 20.00</td>
+                        <td>10</td>
+                        <td>R$ 200.00</td>
+                    </tr>
+                    <tr class="ProductsTableItems">
+                        <td>Beans</td>
+                        <td>R$ 9.00</td>
+                        <td>1</td>
+                        <td>R$ 9.00</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="Payment">
+                <table>
+                    <tr>
+                        <th>Tax:</th>
+                        <td>R$ 6.50</td>
+                    </tr>
+                    <tr>
+                        <th>Total:</th>
+                        <td>R$ 215.50</td>
+                    </tr>
+                </table>
+                <div class="PaymentButtons">
+                    <button class="PaymentButtonCancel">Cancel</button>
+                    <button class="PaymentButtonFinish">Finish</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
