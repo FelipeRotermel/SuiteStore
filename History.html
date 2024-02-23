@@ -16,51 +16,75 @@
             <li class="NavBarLink"><a href="History.html">History</a></li>
         </ul>
     </nav>
-    <div class="HistoryContainer">
+    <div class="ContainerHistory">
+        <h2>History</h2>
         <table class="HistoryTable">
-            <thead class="HistoryTableItems">
-                <th>Code</th>
-                <th>Tax</th>
+            <thead class="HistoryTableInfo">
+                <th>Date</th>
+                <th>Product</th>
+                <th>Price</th>
+                <th>Amount</th>
                 <th>Total</th>
             </thead>
-            <tbody>
-                <tr class="HistoryTableItems">
-                    <td>001</td>
-                    <td class="tax">2.00</td>
-                    <td>20.00</td>
-                    <td><button onclick="ViewProduct()" value="0">View</button></td>
-                </tr>
-                <tr class="HistoryTableItems">
-                    <td>002</td>
-                    <td class="tax">0.50</td>
-                    <td>10.00</td>
-                    <td><button onclick="ViewProduct()" value="1">View</button></td>
-                </tr>
+            <tbody class="HistoryTableItems">
+                <!-- Renderização da tabela -->
             </tbody>
         </table>
         <br>
-        <div id="detail">
-            <p></p>
-        </div>
     </div>
+
+    <script src="/security.js"></script>
 
     <script>
 
-        function ViewProduct() {
+        /* Função para pegar o Histórico */
+        function GetHistory() {
+            let history = JSON.parse(localStorage.getItem('history'));
 
-            var id = event.target.value;
-            console.log(id)
-
-            var tax = document.getElementsByClassName("tax")[id].innerHTML;
-            console.log(tax)
-
-            if(tax == 2) {
-                document.getElementById("detail").innerHTML = "Rice - 2 - 20";
-            } else if(tax == 0.5) {
-                document.getElementById("detail").innerHTML = "Potato - 10 - 10";
+            if (history) {
+                history.forEach(historyItem => {
+                    RenderHistory(historyItem);
+                });
             }
         }
-        
+
+        GetHistory();
+
+        /* Função para renderizar o Histórico */
+        function RenderHistory(historyItem) {
+            let table = document.querySelector('.HistoryTableItems');
+
+            if (Array.isArray(historyItem)) {
+                let dateDisplayed = false;
+
+                for (var i = 0; i < historyItem.length; i++) {
+                    let total = (historyItem[i].price).replace('R$', '').replace('.', '').replace(',', '.') * historyItem[i].amount
+                    let row = document.createElement('tr');
+
+                    if (!dateDisplayed) {
+                        row.innerHTML = `
+                            <td rowspan="${historyItem.length}">${historyItem[i].date}</td>
+                            <td>${historyItem[i].name}</td>
+                            <td>${historyItem[i].price}</td>
+                            <td>${historyItem[i].amount}</td>
+                            <td>${total.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}</td>
+                        `;
+                        dateDisplayed = true;
+                    } else {
+                        row.innerHTML = `
+                            <td>${historyItem[i].name}</td>
+                            <td>${historyItem[i].price}</td>
+                            <td>${historyItem[i].amount}</td>
+                            <td>${total.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}</td>
+                        `;
+                    }
+                    table.append(row);
+                }
+            }
+        }
+
+        RenderHistory();
+
     </script>
     
 </body>

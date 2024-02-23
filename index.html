@@ -18,59 +18,220 @@
     </nav>
     <div class="Container">
         <div class="Column">
-            <select class="ProductInput" name="Product" id="">
-                <option value="" selected disabled>Product</option>
-                <option value="">Beans</option>
-                <option value="">Rice</option>
-            </select>
-            <input class="AmountInput"type="number" placeholder="Amount">
-            <br><br>
-            <input class="TaxInput" type="number" placeholder="Tax">
-            <input class="PriceInput" type="number" placeholder="Price">
-            <br>
-            <button class="ProductsButton">Add Product</button>
+            <h2>Produtos</h2><br>
+            <table class="ProductsTable">
+                <thead class="ProductsTableItems">
+                    <th class="Product">Product</th>
+                    <th class="Others">Price</th>
+                    <th class="Others">Disp.</th>
+                    <th class="Others">Amount</th>
+                    <th class="Others">Action</th>
+                </thead>
+                <tbody class="ProductsTableCategoryItems">
+                    <!-- Renderização da lista -->
+                </tbody>
+            </table>
         </div>
         <div class="Column Line">
+            <h2>Carrinho</h2><br>
             <table class="ProductsTable">
                 <thead class="ProductsTableItems">
                     <th class="Product">Product</th>
                     <th class="Others">Price</th>
                     <th class="Others">Amount</th>
                     <th class="Others">Total</th>
+                    <th class="Others">Action</th>
                 </thead>
-                <tbody>
-                    <tr class="ProductsTableItems">
-                        <td>Rice</td>
-                        <td>R$ 20.00</td>
-                        <td>10</td>
-                        <td>R$ 200.00</td>
-                    </tr>
-                    <tr class="ProductsTableItems">
-                        <td>Beans</td>
-                        <td>R$ 9.00</td>
-                        <td>1</td>
-                        <td>R$ 9.00</td>
-                    </tr>
+                <tbody class="CartProductsItems">
+                    <!-- Renderização da tabela -->
                 </tbody>
             </table>
             <div class="Payment">
                 <table>
                     <tr>
-                        <th>Tax:</th>
-                        <td>R$ 6.50</td>
-                    </tr>
-                    <tr>
                         <th>Total:</th>
-                        <td>R$ 215.50</td>
+                        <td class="Total"></td>
                     </tr>
                 </table>
                 <div class="PaymentButtons">
-                    <button class="PaymentButtonCancel">Cancel</button>
-                    <button class="PaymentButtonFinish">Finish</button>
+                    <button class="PaymentButtonCancel" onclick="CancelProducts()">Cancel</button>
+                    <button class="PaymentButtonFinish" onclick="BuyProducts()">Finish</button>
                 </div>
             </div>
         </div>
     </div>
+
+    <script>
+
+        /* Função para buscar as Categorias */
+        function GetProducts(){
+            let products = JSON.parse(localStorage.getItem('products'));
+
+            if(products){
+                products.forEach(product => {
+                    RenderProduct(product);
+                });
+            }
+        }
+
+        GetProducts();
+
+        /* Função para renderizar as Cetegorias */
+        function RenderProduct(product){
+            let table = document.querySelector('.ProductsTableCategoryItems');
+            let percent = ((product.newCategory.tax / 100) * (product.price));
+            let totalPrice = Number(product.price) + percent;
+            let row = document.createElement('tr');
+            
+            row.innerHTML = `
+                <td>${product.name}</td>
+                <td>${totalPrice.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}</td>
+                <td>${product.amount}</td>
+                <td class="number-input">
+                    <button onclick="this.parentNode.querySelector('input[type=number]').stepDown()">-</button>
+                    <input class="quantity" min="1" max="${product.amount}" name="quantity" value="1" type="number">
+                    <button onclick="this.parentNode.querySelector('input[type=number]').stepUp()">+</button>
+                </td>
+                <td><button class="ProductsAddButton" onclick="PutInCart()">Add</button></td>
+            `;
+
+            table.append(row);
+        }
+
+        /* Função para buscar os Items no Carrinho */
+        function GetPurchases(){
+            let purchases = JSON.parse(localStorage.getItem('purchases'));
+
+            if(purchases){
+                purchases.forEach(purchase => {
+                    RenderPurchase(purchase);
+                });
+            }
+        }
+
+        GetPurchases();
+
+        /* Função para renderizar as Cetegorias */
+        function RenderPurchase(purchase){
+            let numberPrice = (purchase.price).replace('R$', '').replace('.', '').replace(',', '.')
+            let total = numberPrice * purchase.amount;
+            let table = document.querySelector('.CartProductsItems');
+            let row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td>${purchase.name}</td>
+                <td>${purchase.price}</td>
+                <td>${purchase.amount}</td>
+                <td>${total.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}</td>
+                <td><button class="ProductsDeleteButton" onclick="DeletePurchase()">Delete</button></td>
+            `;
+
+            table.append(row);
+        }
+
+        /* Função para mostrar o valor total dos itens do carrinho */
+        function TotalCart() {
+            let purchases = JSON.parse(localStorage.getItem('purchases'));
+            let total = 0;
+
+            if (purchases) {
+                purchases.forEach(purchase => {
+                    let numberPrice = (purchase.price).replace('R$', '').replace('.', '').replace(',', '.');
+                    total += numberPrice * purchase.amount;
+                });
+            }
+
+            document.querySelector('.Total').innerText = total.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' });
+        }
+
+        TotalCart();
+
+        /* Função para adicionar os Produtos no localStorage na key Purchases */
+        function PutInCart() {
+            let purchases = JSON.parse(localStorage.getItem('purchases')) || [];
+            let row = this.event.target.parentElement.parentElement;
+            let name = row.children[0].innerText;
+            let price = row.children[1].innerText;
+            let disp = row.children[2].innerText;
+            let amount = row.children[3].querySelector('input').value;
+            let date = (new Date()).toUTCString('pt-br');
+            let id = 0;
+
+            /* Se o Amount for maior que o disponível, retorna um alerta */
+            if(Number(amount) > disp){
+                alert('Amount is bigger than available');
+                return;
+            }
+
+            for (let i = 0; i < purchases.length; i++) {
+                /* Se o produto já tiver adicionado no Purshases, retorna um alerta*/
+                if (purchases[i].name == name) {
+                    alert('Product already added');
+                    return;
+                }
+                /* Pega o ID do item anterior e adiciona + 1 */
+                if (purchases[i].id >= id) {
+                    id = purchases[i].id + 1;
+                }
+            }
+
+            let purchase = { id, name, price, disp, amount, date };
+            purchases.push(purchase);
+            localStorage.setItem('purchases', JSON.stringify(purchases));
+
+            RenderPurchase(purchase); // Renderiza a nova compra na tabela
+            TotalCart(); // Atualiza o valor total do carrinho
+        }
+
+        /* Função para excluir items do carrinho */
+        function CancelProducts(){
+            localStorage.removeItem('purchases');
+            document.querySelector('.CartProductsItems').innerHTML = '';
+
+            TotalCart();
+        }
+
+        /* Função para comprar items do carrinho */
+        function BuyProducts(){
+            let purchases = JSON.parse(localStorage.getItem('purchases'));
+            
+            if (purchases && purchases.length > 0) {
+
+                if (localStorage.getItem('history') === null) {
+                    localStorage.setItem('history', JSON.stringify([purchases]));
+                } else {
+                    localStorage.setItem('history', JSON.stringify([...JSON.parse(localStorage.getItem('history')), purchases]));
+                };
+
+                localStorage.removeItem('purchases');
+                document.querySelector('.CartProductsItems').innerHTML = '<h2 class="PurchaseCompleted">Purchase completed</h2>';
+
+                setTimeout(() => {
+                    let text = document.querySelector('.PurchaseCompleted');
+                    text.style.display = 'none';
+                },3000);
+                
+                TotalCart();
+
+            } else {
+                alert('No products to buy');
+            }
+        }
+
+        /* Função para delete item no carrinho */
+        function DeletePurchase() {
+            let purchases = JSON.parse(localStorage.getItem('purchases'));
+            let row = this.event.target.parentElement.parentElement;
+            let name = row.children[0].innerText;
+            let price = row.children[1].innerText;
+            let newPurchases = purchases.filter(purchase => purchase.name !== name && purchase.price !== price);
+
+            localStorage.setItem('purchases', JSON.stringify(newPurchases));
+            row.remove(); // Remove a linha da tabela
+            TotalCart(); // Atualiza o valor total do carrinho
+        }
+
+    </script>
 
 </body>
 </html>

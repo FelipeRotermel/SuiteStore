@@ -18,11 +18,12 @@
     </nav>
     <div class="Container">
         <div class="Column">
-            <input class="ProductNameInput" type="text" id="name" placeholder="Product Name">
+            <input class="ProductNameInput" maxlength="60" type="text" id="name" placeholder="Product Name">
             <br>
-            <input class="ProductAmountInput" type="number" id="amount" placeholder="Amount">
-            <input type="number" id="price" placeholder="Price">
+            <input class="ProductAmountInput" min="1" max="9999" type="number" id="amount" placeholder="Amount">
+            <input min="1" max="9999" type="number" id="price" placeholder="Price">
             <select class="ProductSelectInput" id="category">
+                <option disabled selected>Category</option>
             </select>
             <br>
             <button class="ProductsButton" onclick="SaveProduct()">Add Product</button>
@@ -30,7 +31,7 @@
         <div class="Column Line">
             <table class="ProductsTable">
                 <thead class="ProductsTableItems">
-                    <th class="Others">Code</th>
+                    <th class="ID">ID</th>
                     <th class="Product">Product</th>
                     <th class="Others">Amount</th>
                     <th class="Others">Unit Price</th>
@@ -38,6 +39,7 @@
                     <th class="Others">Action</th>
                 </thead>
                 <tbody class="ProductsTableCategoryItems">
+                    <!-- Renderização da lista -->
                 </tbody>
             </table>
         </div>
@@ -45,17 +47,26 @@
 
     <script>
 
-        function RenderCategories(){
-            let categories = JSON.parse(localStorage.getItem('categories'));
-            let select = document.querySelector('.ProductSelectInput');
-            
-            categories.forEach(category => {
-                let option = document.createElement('option');
-                option.innerHTML = category.name;
-                select.append(option);
-            });
-        }
+        /* Verificações de inputs */
+        window.onload = () => {
 
+            /* Desabilitar caracteres especiais */
+            document.querySelector('input[type="text"]').onkeypress = function(e) {
+                const chr = String.fromCharCode(e.which);
+                if ("qwertyuioplkjhgfdsazxcvbnmQWERTYUIOPLKJHGFDSAZXCVBNM".indexOf(chr) < 0)
+                  return false;
+            };
+
+            /* Desabilitar teclas exceto as setas */
+            const arrowsOnly = [...document.querySelectorAll('input[type="number"]')];
+            for (let i = 0; i < arrowsOnly.length; i++){
+                arrowsOnly[i].addEventListener("keypress", (event) => {
+                    event.preventDefault();
+                  });
+            }
+        };
+
+        /* Função para buscar as Categorias */
         function GetCategories(){
             let categories = JSON.parse(localStorage.getItem('categories'));
             if(categories){
@@ -65,44 +76,53 @@
 
         GetCategories();
 
+        /* Função para renderizar as Cetegorias */
+        function RenderCategories(){
+            let categories = JSON.parse(localStorage.getItem('categories'));
+            let select = document.querySelector('.ProductSelectInput');
+            
+            categories.forEach(category => {
+                let option = document.createElement('option');
+                option.value = JSON.stringify(category);
+                option.innerHTML = JSON.stringify(category.name).replace(/"/g, "");
+                select.append(option);
+            });
+        }
+
+        /* Função para salvar o Produto */
         function SaveProduct() {
             let products = JSON.parse(localStorage.getItem('products')) || [];
             let name = document.getElementById("name").value;
             let amount = document.getElementById("amount").value;
             let price = document.getElementById("price").value;
-            let category = document.getElementById("category")
+            let category = document.getElementById("category").value;
+            let newCategory = JSON.parse(category);
             let id = 0;
-            
+
+            /* Não pode estar vazio */
+            if(name == '' || price == '' || amount == ''){
+                alert('Enter All Fields Correct');
+                return;
+            }
+
             for (let i = 0; i < products.length; i++) {
                 if (products[i].id >= id) {
-                    console.log(products[i].id)
                     id = products[i].id + 1;
                 }
             }
             
-            let product = { id, name, amount, price, category };
+            let product = { id, name, amount, price, newCategory };
+
             products.push(product);
             localStorage.setItem('products', JSON.stringify(products));
             
             RenderProduct(product);
         }
 
-        function RenderProduct(product){
-            let table = document.querySelector('.ProductsTableCategoryItems');
-            let row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${product.id}</td>
-                <td>${product.name}</td>
-                <td>${product.amount}</td>
-                <td>${product.price}</td>
-                <td>${category.innerHTML}</td>
-                <td><button class="ProductsDeleteButton" onclick="DeleteProduct()">Delete</button></td>
-            `;
-            table.append(row);
-        }
-
+        /* Função para buscar os Produtos */
         function GetProducts(){
             let products = JSON.parse(localStorage.getItem('products'));
+
             if(products){
                 products.forEach(product => {
                     RenderProduct(product);
@@ -112,11 +132,30 @@
 
         GetProducts();
 
+        /* Função para renderizar os Produtos */
+        function RenderProduct(product){
+            let table = document.querySelector('.ProductsTableCategoryItems');
+            let row = document.createElement('tr');
+
+            row.innerHTML = `
+                <td>${product.id}</td>
+                <td>${product.name}</td>
+                <td>${product.amount}</td>
+                <td>${product.price}</td>
+                <td>${product.newCategory?.name}</td>
+                <td><button class="ProductsDeleteButton" onclick="DeleteProduct()">Delete</button></td>
+            `;
+
+            table.append(row);
+        }
+
+        /* Função para deletar os Produtos */
         function DeleteProduct() {
+            let products = JSON.parse(localStorage.getItem('products'));
             let row = this.event.target.parentElement.parentElement;
             let id = row.children[0].innerText;
             let name = row.children[1].innerText;
-            let products = JSON.parse(localStorage.getItem('products'));
+
             let newProducts = products.filter(product => product.id !== id && product.name !== name);
             localStorage.setItem('products', JSON.stringify(newProducts));
             row.remove();

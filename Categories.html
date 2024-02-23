@@ -18,20 +18,21 @@
     </nav>
     <div class="Container">
         <div class="Column CategoryColumn">
-            <input class="CategoryNameInput" type="text" id="name" placeholder="Category Name">
-            <input class="CategoryTaxInput" type="number" id="tax" placeholder="Tax">
+            <input class="CategoryNameInput" maxlength="60" type="text" id="name" placeholder="Category Name">
+            <input class="CategoryTaxInput" min="1" max="999" type="number" id="tax" placeholder="Tax">
             <br>
-            <button class="ProductsButton" onclick="SaveCategory()">Add Categoty</button>
+            <button class="ProductsButton" onclick="SaveCategory()">Add Category</button>
         </div>
         <div class="Column Line">
             <table class="ProductsTable">
                 <thead class="ProductsTableItems">
-                    <th class="Others">ID</th>
+                    <th class="ID">ID</th>
                     <th class="Product">Category</th>
                     <th class="Others">Tax</th>
                     <th class="Others">Action</th>
                 </thead>
                 <tbody class="ProductsTableCategoryItems">
+                    <!-- Renderização da lista -->
                 </tbody>
             </table>
         </div>
@@ -39,13 +40,37 @@
 
     <script>
 
-    /* Função de salvar a categoria */
+        /* Verificações de inputs */
+        window.onload = () => {
 
+            /* Desabilitar caracteres especiais */
+            document.querySelector('input[type="text"]').onkeypress = function(e) {
+                const chr = String.fromCharCode(e.which);
+                if ("qwertyuioplkjhgfdsazxcvbnmQWERTYUIOPLKJHGFDSAZXCVBNM".indexOf(chr) < 0)
+                  return false;
+            };
+
+            /* Desabilitar teclas exceto as setas */
+            const arrowsOnly = [...document.querySelectorAll('input[type="number"]')];
+            for (let i = 0; i < arrowsOnly.length; i++){
+                arrowsOnly[i].addEventListener("keypress", (event) => {
+                    event.preventDefault();
+                  });
+            }
+        };
+
+        /* Função para salvar as Categorias */
         function SaveCategory() {
             let categories = JSON.parse(localStorage.getItem('categories')) || [];
             let name = document.getElementById("name").value;
             let tax = document.getElementById("tax").value;
             let id = 0;
+
+            /* Verificar se todos os inputs estão corretos */
+            if(name == '' || tax == ''){
+                alert('Enter All Fields Correct');
+                return;
+            }
             
             for (let i = 0; i < categories.length; i++) {
                 if (categories[i].id >= id) {
@@ -53,32 +78,19 @@
                     id = categories[i].id + 1;
                 }
             }
-            
+
             let category = { id, name, tax };
+
             categories.push(category);
             localStorage.setItem('categories', JSON.stringify(categories));
             
             RenderCategory(category);
         }
 
-        /* Fução de renderizar a categoria em uma table*/
-
-        function RenderCategory(category){
-            let table = document.querySelector('.ProductsTableCategoryItems');
-            let row = document.createElement('tr');
-            row.innerHTML = `
-                <td>${category.id}</td>
-                <td>${category.name}</td>
-                <td>${category.tax}</td>
-                <td><button class="ProductsDeleteButton" onclick="DeleteCategory()">Delete</button></td>
-            `;
-            table.append(row);
-        }
-
-        /* Função de mostrar a categoria na tabela*/
-
+        /* Função para buscar as Categorias */
         function GetCategories(){
             let categories = JSON.parse(localStorage.getItem('categories'));
+
             if(categories){
                 categories.forEach(category => {
                     RenderCategory(category);
@@ -88,13 +100,28 @@
 
         GetCategories();
 
-        /* Função de excluir categoria*/
+        /* Função para renderizar as Categorias */
+        function RenderCategory(category){
+            let table = document.querySelector('.ProductsTableCategoryItems');
+            let row = document.createElement('tr');
 
+            row.innerHTML = `
+                <td>${category.id}</td>
+                <td>${category.name}</td>
+                <td>${category.tax}</td>
+                <td><button class="ProductsDeleteButton" onclick="DeleteCategory()">Delete</button></td>
+            `;
+            
+            table.append(row);
+        }
+
+        /* Função para excluir as Categorias */
         function DeleteCategory() {
+            let categories = JSON.parse(localStorage.getItem('categories'));
             let row = this.event.target.parentElement.parentElement;
             let id = row.children[0].innerText;
             let name = row.children[1].innerText;
-            let categories = JSON.parse(localStorage.getItem('categories'));
+
             let newCategories = categories.filter(category => category.id !== id && category.name !== name);
             localStorage.setItem('categories', JSON.stringify(newCategories));
             row.remove();

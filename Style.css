@@ -65,15 +65,15 @@ button {
     float: left;
     width: 50%;
     padding: 10px;
+    text-align: center;
 }
 
 .Line {
     border-left: 1px rgba(77, 77, 77, 0.445) solid;
     height: 85vh;
-    text-align: start;
 }
 
-input {
+input, select {
     font-size: 15px;
     background-color: rgba(243, 243, 243, 0.5);
     border: 1px rgba(77, 77, 77, 0.445) solid;
@@ -93,7 +93,7 @@ input {
 }
 
 .ProductsButton {
-    width: 91.5%;
+    width: 90.6%;
     font-size: 20px;
     font-weight: bolder;
     margin-top: 20px;
@@ -111,16 +111,25 @@ input {
     border-radius: 5px;
 }
 
-.ProductsTable {
+.ProductsAddButton {
+    width: 50%;
+    font-size: 15px;
+    font-weight: bolder;
+    border: 1px rgba(77, 77, 77, 0.445) solid;
+    background-color: rgb(43, 255, 0);
+    border-radius: 5px;
+}
+
+.ProductsTable, .HistoryTable {
     border-collapse: collapse;
     border-left: 2px solid white;
     height: 10%;
 }
 
-.ProductsTableItems th, .ProductsTableItems td, .ProductsTableCategoryItems td {
+.ProductsTableItems th, .ProductsTableItems td, .ProductsTableCategoryItems td, .CartProductsItems td, .HistoryTable th, .HistoryTableItems td{
     border-bottom: 1px solid rgba(77, 77, 77, 0.445);
     border-left: 1px solid rgba(77, 77, 77, 0.445);
-    padding-left: 5px;
+    padding: 10px;
 }
 
 .Product {
@@ -133,8 +142,13 @@ input {
     text-align: start;
 }
 
+.ID {
+    width: 3vh;
+    text-align: start;
+}
+
 .Payment {
-    position: absolute;
+    position: fixed;
     width: 25%;
     right: 0;
     bottom: 0;
@@ -173,6 +187,7 @@ input {
 
 .CategoryColumn {
     display: inline;
+    text-align: center;
 }
 
 .CategoryNameInput {
@@ -187,24 +202,26 @@ input {
 
 /* History */
 
-.HistoryContainer {
-    display: flex;
+.ContainerHistory {
+    display: grid;
     justify-content: center;
-    align-items: center;
+    text-align: center;
+    clear: both;
+    width: 100%;
+    margin-top: 10vh;
+}
+
+.ContainerHistory h2 {
+    margin-bottom: 2vh;
 }
 
 .HistoryTable {
-    border-collapse: collapse;
-    border-left: 2px solid white;
-    width: 50%;
-    height: 70%;
-    margin: 40vh;
+    border: 2px rgba(77, 77, 77, 0.445) solid;
+    border-radius: 5px;
 }
 
-.HistoryTableItems th, .HistoryTableItems td {
-    border-bottom: 1px solid rgba(77, 77, 77, 0.445);
-    border-left: 1px solid rgba(77, 77, 77, 0.445);
-    padding-left: 5px;
+.HistoryTableItems tr {
+    height: 10px;
 }
 
 /* Home */
@@ -230,3 +247,37 @@ input {
     margin-left: 4px;
     margin-right: 5px;
 }
+
+.PurchaseCompleted {
+    position: absolute;
+    text-align: center;
+    margin-top: 23vh;
+    margin-left: 15vw;
+    color: green;
+}
+
+.quantity {
+    width: 35px;
+    text-align: center;
+    border: 0;
+  }
+  
+.quantity[type=number]::-webkit-inner-spin-button, .quantity[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+}
+  
+.number-input {
+    display: flex;
+}
+
+.number-input button {
+    font-weight: bolder;
+    outline:none;
+    border: none;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    cursor: pointer;
+}
+  
