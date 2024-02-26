@@ -63,6 +63,37 @@
 
     <script>
 
+        /* Verificações de inputs */
+        window.onload = () => {
+
+            const text = [...document.querySelectorAll('input[type="text"]')];
+            const number = [...document.querySelectorAll('input[type="number"]')];
+
+            /* Desabilitar caracteres especiais */
+            for(let i = 0; i < text.length; i++){
+                text[i].onpaste = event => {
+                    event.preventDefault();
+                    return false;
+                }
+                text[i].onkeypress = function(event) {
+                    const chr = String.fromCharCode(event.which);
+                    if ("qwertyuioplkjhgfdsazxcvbnmQWERTYUIOPLKJHGFDSAZXCVBNM".indexOf(chr) < 0)
+                      return false;
+                };
+            }
+
+            /* Desabilitar teclas exceto as setas */
+            for (let i = 0; i < number.length; i++){
+                number[i].onpaste = event => {
+                    event.preventDefault();
+                    return false;
+                }
+                number[i].addEventListener("keypress", (event) => {
+                    event.preventDefault();
+                  });
+            }
+        };
+
         /* Função para buscar as Categorias */
         function GetProducts(){
             let products = JSON.parse(localStorage.getItem('products'));

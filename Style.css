@@ -135,7 +135,7 @@ input, select {
 .inputWithButton {
     display: flex;
     align-items: center;
-    height: 4.5vh;
+    height: 5vh;
 }
 
 .inputWithButton input {

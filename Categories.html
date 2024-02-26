@@ -43,17 +43,29 @@
         /* Verificações de inputs */
         window.onload = () => {
 
+            const text = [...document.querySelectorAll('input[type="text"]')];
+            const number = [...document.querySelectorAll('input[type="number"]')];
+
             /* Desabilitar caracteres especiais */
-            document.querySelector('input[type="text"]').onkeypress = function(e) {
-                const chr = String.fromCharCode(e.which);
-                if ("qwertyuioplkjhgfdsazxcvbnmQWERTYUIOPLKJHGFDSAZXCVBNM".indexOf(chr) < 0)
-                  return false;
-            };
+            for(let i = 0; i < text.length; i++){
+                text[i].onpaste = event => {
+                    event.preventDefault();
+                    return false;
+                }
+                text[i].onkeypress = function(event) {
+                    const chr = String.fromCharCode(event.which);
+                    if ("qwertyuioplkjhgfdsazxcvbnmQWERTYUIOPLKJHGFDSAZXCVBNM".indexOf(chr) < 0)
+                      return false;
+                };
+            }
 
             /* Desabilitar teclas exceto as setas */
-            const arrowsOnly = [...document.querySelectorAll('input[type="number"]')];
-            for (let i = 0; i < arrowsOnly.length; i++){
-                arrowsOnly[i].addEventListener("keypress", (event) => {
+            for (let i = 0; i < number.length; i++){
+                number[i].onpaste = event => {
+                    event.preventDefault();
+                    return false;
+                }
+                number[i].addEventListener("keypress", (event) => {
                     event.preventDefault();
                   });
             }
