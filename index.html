@@ -79,13 +79,12 @@
         /* Função para renderizar as Cetegorias */
         function RenderProduct(product){
             let table = document.querySelector('.ProductsTableCategoryItems');
-            let percent = ((product.newCategory.tax / 100) * (product.price));
-            let totalPrice = Number(product.price) + percent;
             let row = document.createElement('tr');
+            console.log(product)
             
             row.innerHTML = `
                 <td>${product.name}</td>
-                <td>${totalPrice.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}</td>
+                <td>${product.totalPrice.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}</td>
                 <td>${product.amount}</td>
                 <td class="number-input">
                     <button onclick="this.parentNode.querySelector('input[type=number]').stepDown()">-</button>
@@ -193,6 +192,9 @@
 
         /* Função para comprar items do carrinho */
         function BuyProducts(){
+            let history = JSON.parse(localStorage.getItem('history')) || [];
+            /* Dando get no localStorage par mudar a qtd disponível do produto quando comprar */
+            let newProducts = JSON.parse(localStorage.getItem('products'));
             let purchases = JSON.parse(localStorage.getItem('purchases'));
             
             if (purchases && purchases.length > 0) {
@@ -203,6 +205,18 @@
                     localStorage.setItem('history', JSON.stringify([...JSON.parse(localStorage.getItem('history')), purchases]));
                 };
 
+                /* Buscando o produto para alterar a qtd */
+                purchases.forEach(purchase =>{
+                    newProducts.forEach(product => {
+                        if(purchase.name == product.name){
+                            product.amount = parseFloat(product.amount) - parseFloat(purchase.amount)
+                        }
+                    })
+                })
+
+                let product = JSON.stringify(newProducts);
+
+                localStorage.setItem('products', product)
                 localStorage.removeItem('purchases');
                 document.querySelector('.CartProductsItems').innerHTML = '<h2 class="PurchaseCompleted">Purchase completed</h2>';
 
@@ -210,7 +224,9 @@
                     let text = document.querySelector('.PurchaseCompleted');
                     text.style.display = 'none';
                 },3000);
-                
+
+                document.querySelector('.ProductsTableCategoryItems').innerText = ''
+                GetProducts();
                 TotalCart();
 
             } else {

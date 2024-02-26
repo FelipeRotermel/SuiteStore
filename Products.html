@@ -97,6 +97,8 @@
             let price = document.getElementById("price").value;
             let category = document.getElementById("category").value;
             let newCategory = JSON.parse(category);
+            let percent = (Number(newCategory.tax) / 100) * price;
+            let totalPrice = Number(price) + percent;
             let id = 0;
 
             /* Não pode estar vazio */
@@ -111,7 +113,7 @@
                 }
             }
             
-            let product = { id, name, amount, price, newCategory };
+            let product = { id, name, amount, totalPrice, newCategory };
 
             products.push(product);
             localStorage.setItem('products', JSON.stringify(products));
@@ -140,13 +142,35 @@
             row.innerHTML = `
                 <td>${product.id}</td>
                 <td>${product.name}</td>
-                <td>${product.amount}</td>
-                <td>${product.price}</td>
+                <td class="inputWithButton">
+                    <input class="ProductsEditButton" min="1" max="9999" type="number" value="${product.amount}">
+                    <button onclick="EditAmountProduct()">Edit</button>
+                </td>
+                <td>${product.totalPrice.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}</td>
                 <td>${product.newCategory?.name}</td>
                 <td><button class="ProductsDeleteButton" onclick="DeleteProduct()">Delete</button></td>
             `;
 
             table.append(row);
+        }
+
+        /* Função para editar o amount do Produto */
+        function EditAmountProduct(){
+            let products = JSON.parse(localStorage.getItem('products'));
+            let row = this.event.target.parentElement.parentElement;
+            let id = row.children[0].innerText;
+            let amount = row.querySelector('.ProductsEditButton').value;
+            
+            if(amount == null || amount == undefined || amount == 0){
+                alert('Amount on input is null')
+            } else {
+                products.forEach(product => {
+                    if(product.id == id)
+                        product.amount = amount
+                })
+
+                localStorage.setItem('products', JSON.stringify(products))
+            }
         }
 
         /* Função para deletar os Produtos */
