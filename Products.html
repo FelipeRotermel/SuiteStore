@@ -158,7 +158,7 @@
                     <input class="ProductsEditButton" min="1" max="9999" type="number" value="${product.amount}">
                     <button onclick="EditAmountProduct()">Edit</button>
                 </td>
-                <td>${product.totalPrice.toLocaleString('pt-br', { style: 'currency', currency: 'BRL' })}</td>
+                <td>${product.totalPrice.toLocaleString('en-US',{style: 'currency', currency: 'USD'})}</td>
                 <td>${product.newCategory?.name}</td>
                 <td><button class="ProductsDeleteButton" onclick="DeleteProduct()">Delete</button></td>
             `;

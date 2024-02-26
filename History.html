@@ -56,7 +56,7 @@
                 let dateDisplayed = false;
 
                 for (var i = 0; i < historyItem.length; i++) {
-                    let total = (historyItem[i].price).replace('R$', '').replace('.', '').replace(',', '.') * historyItem[i].amount
+                    let total = (historyItem[i].price).replace('$', '').replace(',', '') * historyItem[i].amount
                     let row = document.createElement('tr');
 
                     if (!dateDisplayed) {

@@ -23,8 +23,8 @@
                 <thead class="ProductsTableItems">
                     <th class="Product">Product</th>
                     <th class="Others">Price</th>
+                    <th class="Others">Tax</th>
                     <th class="Others">Disp.</th>
-                    <th class="Others">Amount</th>
                     <th class="Others">Action</th>
                 </thead>
                 <tbody class="ProductsTableCategoryItems">
@@ -39,7 +39,6 @@
                     <th class="Product">Product</th>
                     <th class="Others">Price</th>
                     <th class="Others">Amount</th>
-                    <th class="Others">Total</th>
                     <th class="Others">Action</th>
                 </thead>
                 <tbody class="CartProductsItems">
@@ -111,17 +110,12 @@
         function RenderProduct(product){
             let table = document.querySelector('.ProductsTableCategoryItems');
             let row = document.createElement('tr');
-            console.log(product)
             
             row.innerHTML = `
                 <td>${product.name}</td>
-                <td>${product.totalPrice.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}</td>
+                <td>${product.totalPrice.toLocaleString('en-US',{style: 'currency', currency: 'USD'})}</td>
+                <td>${product.newCategory.tax}%</td>
                 <td>${product.amount}</td>
-                <td class="number-input">
-                    <button onclick="this.parentNode.querySelector('input[type=number]').stepDown()">-</button>
-                    <input class="quantity" min="1" max="${product.amount}" name="quantity" value="1" type="number">
-                    <button onclick="this.parentNode.querySelector('input[type=number]').stepUp()">+</button>
-                </td>
                 <td><button class="ProductsAddButton" onclick="PutInCart()">Add</button></td>
             `;
 
@@ -143,16 +137,17 @@
 
         /* Função para renderizar as Cetegorias */
         function RenderPurchase(purchase){
-            let numberPrice = (purchase.price).replace('R$', '').replace('.', '').replace(',', '.')
-            let total = numberPrice * purchase.amount;
             let table = document.querySelector('.CartProductsItems');
             let row = document.createElement('tr');
 
             row.innerHTML = `
                 <td>${purchase.name}</td>
                 <td>${purchase.price}</td>
-                <td>${purchase.amount}</td>
-                <td>${total.toLocaleString('pt-br',{style: 'currency', currency: 'BRL'})}</td>
+                <td class="number-input">
+                    <button onclick="this.parentNode.querySelector('input[type=number]').stepDown();TotalCart();PutAmountInCart()">-</button>
+                    <input class="quantity" min="1" max="${purchase.disp}" name="quantity" value="1" type="number">
+                    <button onclick="this.parentNode.querySelector('input[type=number]').stepUp();TotalCart();PutAmountInCart()">+</button>
+                </td>
                 <td><button class="ProductsDeleteButton" onclick="DeletePurchase()">Delete</button></td>
             `;
 
@@ -162,12 +157,14 @@
         /* Função para mostrar o valor total dos itens do carrinho */
         function TotalCart() {
             let purchases = JSON.parse(localStorage.getItem('purchases'));
+            let quantities = document.querySelectorAll('.quantity');
             let total = 0;
 
             if (purchases) {
-                purchases.forEach(purchase => {
-                    let numberPrice = (purchase.price).replace('R$', '').replace('.', '').replace(',', '.');
-                    total += numberPrice * purchase.amount;
+                purchases.forEach((purchase, ItemPurchase) => {
+                    let numberPrice = parseFloat(purchase.price.replace('$', '').replace(',', ''));
+                    let amount = parseInt(quantities[ItemPurchase].value);
+                    total += numberPrice * amount;
                 });
             }
 
@@ -182,35 +179,39 @@
             let row = this.event.target.parentElement.parentElement;
             let name = row.children[0].innerText;
             let price = row.children[1].innerText;
-            let disp = row.children[2].innerText;
-            let amount = row.children[3].querySelector('input').value;
+            let amount = 1
+            let disp = row.children[3].innerText;
             let date = (new Date()).toUTCString('pt-br');
             let id = 0;
 
-            /* Se o Amount for maior que o disponível, retorna um alerta */
-            if(Number(amount) > disp){
-                alert('Amount is bigger than available');
-                return;
-            }
-
             for (let i = 0; i < purchases.length; i++) {
-                /* Se o produto já tiver adicionado no Purshases, retorna um alerta*/
-                if (purchases[i].name == name) {
-                    alert('Product already added');
-                    return;
-                }
                 /* Pega o ID do item anterior e adiciona + 1 */
                 if (purchases[i].id >= id) {
                     id = purchases[i].id + 1;
                 }
             }
 
-            let purchase = { id, name, price, disp, amount, date };
+            let purchase = { id, name, price, disp, date, amount };
             purchases.push(purchase);
             localStorage.setItem('purchases', JSON.stringify(purchases));
 
             RenderPurchase(purchase); // Renderiza a nova compra na tabela
             TotalCart(); // Atualiza o valor total do carrinho
+        }
+
+        function PutAmountInCart(){
+            let purchases = JSON.parse(localStorage.getItem('purchases'));
+            let row = this.event.target.parentElement.parentElement;
+            let name = row.children[0].innerText;
+            let amount = row.querySelector('.quantity').value;
+            
+            purchases.forEach(product => {
+                if(product.name == name){
+                    product.amount = amount
+                }
+            })
+
+            localStorage.setItem('purchases', JSON.stringify(purchases))
         }
 
         /* Função para excluir items do carrinho */
@@ -224,7 +225,7 @@
         /* Função para comprar items do carrinho */
         function BuyProducts(){
             let history = JSON.parse(localStorage.getItem('history')) || [];
-            /* Dando get no localStorage par mudar a qtd disponível do produto quando comprar */
+            /* Dando get no localStorage para mudar a qtd disponível do produto quando comprar */
             let newProducts = JSON.parse(localStorage.getItem('products'));
             let purchases = JSON.parse(localStorage.getItem('purchases'));
             
